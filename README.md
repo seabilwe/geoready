@@ -23,7 +23,7 @@ the **QGIS Notebook** plugin, where the last cell loads the results onto your ma
   potential sits behind them.
 * **Cost barely separates zones.** 90% of zones fall within ±5% of the median base-case LCOE.
   What separates them is grid headroom.
-* **Calibration.** The low cost case (median ≈ R540/MWh) lands near REIPPPP Bid Window 7 solar
+* **Calibration.** The low-cost case (median ≈ R540/MWh) lands near REIPPPP Bid Window 7 solar
   prices (R500–514/MWh). The base case (≈ R850/MWh) is conservative: fixed-tilt yield, a public
   discount rate, cautious CAPEX. Read the cost axis as relative.
 
@@ -39,7 +39,7 @@ not modelled, so every allocation is an upper bound. Unknown values are kept apa
 | Notebook | Does |
 |---|---|
 | `00_run_record` | Creates the run: `run_id`, parameter file, input checksums, software versions |
-| `01_eligibility_zones` | Codes every 250 m cell with an exclusion reason: protected area (legal, burned all-touched), then technical thresholds (land cover, slope > 15°, PVOUT < 1,900, > 50 km from a ≥132 kV substation). Cuts eligible land into 10 km zones that never cross a GCCA substation zone |
+| `01_eligibility_zones` | Codes every 250 m cell with an exclusion reason: protected area (legal, burned, all-touched), then technical thresholds (land cover, slope > 15°, PVOUT < 1,900, > 50 km from a ≥132 kV substation). Cuts eligible land into 10 km zones that never cross a GCCA substation zone |
 | `02_capacity_cost` | MW = eligible km² × 87 MWdc/km² × land-use factor; yield from PVOUT; connection cost per project; LCOE for low, base and high cases |
 | `03_grid_readiness` | Joins GCCA 2025 limits (substation ⊂ local area ⊂ supply area), allocates capacity cheapest-first so shared headroom is never double-counted, draws supply curves, scores readiness 0–1 and tests weight sensitivity |
 | `04_qa_publish` | Release gate, then writes the GeoPackage, CSVs, eligibility GeoTIFF, an OSeMOSYS-style regional band table and the run record |
@@ -64,7 +64,7 @@ All assumptions, with sources, are in [`config/northern_cape_pv.yaml`](config/no
 ```bash
 git clone https://github.com/seabilwe/geoready && cd geoready
 pip install -e ".[notebooks,test]"
-# put the prepared inputs in data/prepared/ (see data/README.md)
+# Put the prepared inputs in data/prepared/ (see data/README.md)
 jupyter lab notebooks/
 ```
 
@@ -76,7 +76,7 @@ Run the notebooks in order. Each writes into `runs/<run_id>/`.
 2. QGIS's Python needs `pytest` and `scipy` for the tests. In the OSGeo4W Shell:
    `python -m pip install --user pytest scipy`. GeoPandas, rasterio and the rest ship with QGIS.
 3. Open `notebooks/00_run_record.ipynb` in the Notebook panel and run the cells, then 01 to 04.
-   The plugin shows printed text, so tables print and figures are saved into the run folder.
+   The plugin prints text, so tables print and figures are saved to the run folder.
 4. The last cell of `04_qa_publish` adds the styled zones and eligibility grid to your map.
 
 ## Data
