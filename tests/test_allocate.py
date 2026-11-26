@@ -35,7 +35,7 @@ def test_upper_level_binds():
     z = small_network()
     out = allocate(z, {"S1": 500.0, "S2": 500.0, "L": 100.0}, CHAIN)
     assert out["alloc_mw"].sum() == pytest.approx(100)
-    # cheapest (d, 400) takes 60, then b (450) the remaining 40
+    # cheapest (d, 400) takes 60, then b (450) takes the remaining 40
     s = out.set_index("zone_id")["alloc_mw"]
     assert s["d"] == 60 and s["b"] == 40
 
