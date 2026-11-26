@@ -10,10 +10,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-READY = ["#F1E8D6", "#E2C79D", "#C99A64", "#A0673A", "#6B3F22"]   # same ramp as the web page
-CODES = [(0, "#E3A857", "Eligible"), (1, "#5E7A4F", "Protected area (legal)"),
-         (2, "#A99C88", "Incompatible land cover"), (3, "#7C6A58", "Too steep"),
-         (4, "#C9C2B4", "Weak solar resource"), (5, "#E9E4DA", "Too far from a substation"),
+READY = ["#F5ECCB", "#EDD38A", "#D9AE4A", "#B07F26", "#6E4E17"]   # same ramp as the web page
+CODES = [(0, "#D9AE4A", "Eligible"), (1, "#5E7A4F", "Protected area (legal)"),
+         (2, "#B5B0A6", "Incompatible land cover"), (3, "#8A8F8C", "Too steep"),
+         (4, "#D3D0C8", "Weak solar resource"), (5, "#E9E4DA", "Too far from a substation"),
          (9, "#B04A3C", "Unknown (input missing)")]
 
 

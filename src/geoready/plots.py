@@ -8,9 +8,9 @@ from matplotlib.patches import Patch
 
 INK, MUTED, GRID = "#2B2A28", "#77736C", "#E4E0D8"
 # Exclusion reasons: legal first, technical in muted earth tones, eligible in amber.
-CODE_COLORS = {0: "#E3A857", 1: "#5E7A4F", 2: "#A99C88", 3: "#7C6A58", 4: "#C9C2B4", 5: "#E9E4DA", 9: "#B04A3C"}
+CODE_COLORS = {0: "#D9AE4A", 1: "#5E7A4F", 2: "#B5B0A6", 3: "#8A8F8C", 4: "#D3D0C8", 5: "#E9E4DA", 9: "#B04A3C"}
 # Readiness: one hue, light to dark.
-READY = ["#F1E8D6", "#E2C79D", "#C99A64", "#A0673A", "#6B3F22"]   # same ramp as the web page
+READY = ["#F5ECCB", "#EDD38A", "#D9AE4A", "#B07F26", "#6E4E17"]   # same ramp as the web page
 
 
 def _clean(ax):
@@ -46,11 +46,11 @@ def supply_curves(curves: dict, ref_band=None, titles=None):
         if len(sc) > 150:   # many thin steps: draw the outline, not the bars
             x = np.r_[sc["mw_from"].values, sc["mw_to"].values[-1]] / scale
             y = np.r_[sc["lcoe"].values, sc["lcoe"].values[-1]]
-            ax.fill_between(x, y, step="post", color="#A0673A", linewidth=0)
+            ax.fill_between(x, y, step="post", color="#B07F26", linewidth=0)
             ax.set_xlim(0, x[-1] * 1.02)
         elif len(sc):
             ax.bar(sc["mw_from"] / scale, sc["lcoe"], width=sc["alloc_mw"] / scale, align="edge",
-                   color="#A0673A", edgecolor="white", linewidth=0.6)
+                   color="#B07F26", edgecolor="white", linewidth=0.6)
             ax.set_xlim(0, sc["mw_to"].max() / scale * 1.02)
         else:
             ax.text(0.5, 0.5, "0 MW connectable", transform=ax.transAxes, ha="center", va="center",
