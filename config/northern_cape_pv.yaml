@@ -1,0 +1,108 @@
+# GeoReady v0.1 — Northern Cape utility-scale solar PV
+# Every threshold and assumption here is editable. Sources are given beside
+# each value. Costs are indicative screening values, not engineering
+# estimates: real rand, base year 2025, excluding VAT.
+
+model_id: geoready
+scenario_id: nc-pv-v01
+study_area: {id: ZA-NC, name: Northern Cape, source: MDB 2020 province boundary}
+baseline_year: 2025
+crs_metric: "EPSG:9221"   # Hartebeesthoek94 / Africa Albers Equal Area (km² and km)
+crs_web: "EPSG:4326"
+
+# Prepared 250 m grids, all on one grid in the analysis CRS (Albers equal-area
+# centred on the Northern Cape: +proj=aea +lat_0=-29 +lon_0=21.5 +lat_1=-25.5
+# +lat_2=-31.5 +datum=WGS84). Built from the raw sources by
+# scripts/prepare_inputs_qgis.py; see data/README.md. Paths are relative to
+# the repo root; data/ is not committed.
+grids:
+  study_area: data/prepared/nc.tif           # MDB/geoBoundaries province, 1 inside
+  pvout: data/prepared/pvout.tif             # Global Solar Atlas 2.0 PVOUT, kWh/kWp/yr
+  slope: data/prepared/slope.tif             # degrees, from Copernicus DEM GLO-90
+  landcover: data/prepared/landcover.tif     # DFFE SANLC 2022 class codes (mode)
+  dist_sub_m: data/prepared/dist_sub.tif     # metres to nearest OSM substation >= 132 kV
+  redz_solar: data/prepared/redz_solar.tif   # DFFE/CSIR solar REDZ, 1 inside
+  eia_pv: data/prepared/reea_pv.tif          # DFFE/CSIR solar PV EIA applications (2021), 1 inside
+  gcca_zone: data/prepared/gcca_zone.tif     # fid of the GCCA 2025 substation zone
+vectors: data/prepared/re_site_za.gpkg       # layers: gcca_zones, nc, substations, redz, protected
+# WDPA designated terrestrial protected areas (layer 'protected'), burned with
+# all-touched so no edge cell of a protected area can be eligible.
+protected_layer: protected
+
+eligibility:
+  # Legal prohibition, never overridden: designated protected areas (WDPA).
+  # Technical thresholds below are editable and reported as separate reasons.
+  max_slope_deg: 15
+  # SANLC 2022 codes: 1-2 forest/thicket, 5-7 plantations, 14-24 water and
+  # wetlands, 29 coastal dunes, 30 riverbeds, 32-41 cropland, 47-67 built-up,
+  # 68-72 mines and landfills, 73 fallow wetland fields (as RE-SITE ZA).
+  excluded_landcover_codes: [1, 2, "5-7", "14-24", 29, 30, "32-41", "47-73"]
+  min_pvout: 1900          # kWh/kWp/yr; the province spans about 1,720-2,100
+  # Screening cap on distance to a >=132 kV substation. Beyond it a project
+  # usually needs new transmission, not a connection line (a judgement call).
+  max_grid_km: 50
+
+zones:
+  size_km: 10              # eligible land is cut into 10 km squares...
+  split_by_gcca: true      # ...and never spans two GCCA substation zones
+  min_eligible_km2: 25
+
+capacity:
+  # Bolinger & Bolinger (2022), IEEE J. Photovoltaics, US 2019 medians:
+  # fixed-tilt 0.87 MWdc/ha = 87 MWdc/km² of fenced plant area.
+  # Global Solar Atlas PVOUT assumes a fixed-tilt layout, so fixed-tilt is used.
+  density_mwdc_per_km2: 87
+  # Share of eligible zone land that could realistically be fenced for PV
+  # (access, drainage, setbacks, landowner uptake). A screening assumption.
+  land_use_factor: {low: 0.05, base: 0.10, high: 0.20}
+  min_project_mw: 20
+
+economics:
+  currency: ZAR
+  price_base_year: 2025
+  # Plant CAPEX excluding grid connection, R/kWdc.
+  # Anchors: IRENA (2025) global weighted-average total installed cost for
+  # utility-scale PV in 2024, USD 691/kW; REIPPPP BW7 first preferred bidders,
+  # R31.4 bn for 1,760 MW (about R17,800/kW all-in, incl. connection and
+  # development) as an upper reference.
+  capex_per_kw: {low: 11500, base: 14000, high: 17000}
+  # Fixed O&M, R/kWdc/yr: about 1.2% of CAPEX a year (NREL ATB ratio after
+  # Feldman et al.).
+  opex_per_kw_year: {low: 140, base: 170, high: 210}
+  # 132 kV overhead line, R/km. Eskom 240-104073096 (2016) Table 4, 2014
+  # rand, escalated by Stats SA CPI 2014->2025 (x1.68): Tern single circuit
+  # 1.85, Twin Tern 2.27, Twin Tern double circuit 3.94 Rm/km.
+  line_cost_per_km: {low: 3100000, base: 3800000, high: 6600000}
+  # Substation feeder bay (R7.8m) plus an on-site station (satellite R14.0m,
+  # collector R29.4m), same document Table 8, x1.68.
+  connection_fixed_cost: {low: 13000000, base: 37000000, high: 63000000}
+  # Each project builds its own line and on-site station. REIPPPP BW7 solar
+  # projects were 170-240 MW; earlier rounds 75-100 MW.
+  project_mw: {low: 240, base: 150, high: 75}
+  # Straight-line distance is a lower bound on the line route.
+  route_factor: {low: 1.1, base: 1.3, high: 1.5}
+  # Real discount rate. Base: 8.2% real social discount rate used in IRP 2019
+  # (National Treasury).
+  discount_rate: {low: 0.06, base: 0.082, high: 0.105}
+  lifetime_years: {low: 30, base: 25, high: 25}
+  degradation: 0.005
+  # Reference band for the supply curve: REIPPPP BW7 solar PV preferred
+  # bidders (Free State, July 2025), R499.99-514.06/MWh.
+  reference_bids_r_per_mwh: [500, 514]
+
+grid:
+  # NTCSA GCCA 2025 limits, three nested levels. Unknown limits are not
+  # treated as available.
+  levels: [sub_limit_mw, local_limit_mw, supply_limit_mw]
+  scenarios:
+    published:    {label: "GCCA 2025 as published", use: [sub_limit_mw, local_limit_mw, supply_limit_mw]}
+    strengthened: {label: "Upstream strengthened (substation limits only)", use: [sub_limit_mw]}
+    unconstrained: {label: "Technical potential (no grid limit)", use: []}
+  unknown_policy: zero
+
+readiness:   # weights sum to 1; bounds fixed so scores compare across runs
+  resource:      {column: pvout,         weight: 0.20, lo: 1900, hi: 2100}
+  cost:          {column: lcoe_base,     weight: 0.25, lo: 700,  hi: 1000, higher_is_better: false}
+  grid_access:   {column: grid_km,       weight: 0.15, lo: 0,    hi: 50,   higher_is_better: false}
+  grid_headroom: {column: headroom_share, weight: 0.25, lo: 0,   hi: 1}
+  permitting:    {column: redz_share,    weight: 0.15, lo: 0,    hi: 1}

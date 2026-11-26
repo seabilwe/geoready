@@ -1,0 +1,10 @@
+data/raw/
+data/prepared/
+data/prepared_r*/
+runs/*/
+!runs/README.md
+__pycache__/
+*.egg-info/
+.ipynb_checkpoints/
+.pytest_cache/
+*.aux.xml

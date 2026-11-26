@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geoready"
+version = "0.1.0"
+description = "Solar PV investment readiness screening: eligible land, capacity, indicative cost, grid headroom and readiness by zone."
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "Seabilwe Tilodi"}]
+requires-python = ">=3.10"
+dependencies = [
+  "numpy", "pandas", "scipy", "pyyaml",
+  "geopandas>=0.14", "shapely>=2", "pyogrio", "rasterio", "matplotlib",
+]
+
+[project.optional-dependencies]
+notebooks = ["jupyterlab", "nbclient", "nbconvert"]
+test = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
