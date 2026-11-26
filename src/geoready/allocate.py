@@ -1,6 +1,6 @@
 """Grid-constrained allocation of capacity to zones.
 
-Each zone connects through a chain of grid limits, for example
+Each zone connects through a chain of grid limits, for example,
 substation -> local area -> supply area (the GCCA hierarchy). Limits are
 shared: every zone behind a substation draws on the same headroom, so the
 same MW are never counted twice.
